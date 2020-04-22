@@ -1,6 +1,6 @@
 service: serverless-todos
 app: serverless-todos-app
-org: chrisserverlesstodosaws
+org: evanjmg
 
 provider:
   name: aws
