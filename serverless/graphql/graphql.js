@@ -5,7 +5,7 @@ const uuid = require("uuid/v4");
 AWS.config.update({
   region: "us-east-2",
   accessKeyId: process.env.MY_AWS_ACCESS_KEY_ID,
-  secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY
+  secretAccessKey: process.env.MY_AWS_SECRET_ACCESS_KEY,
 });
 
 const table = "todos";
@@ -39,18 +39,18 @@ const resolvers = {
           KeyConditionExpression: "pk = :userid and begins_with(sk, :todokey)",
           ExpressionAttributeValues: {
             ":userid": `user#${user}`,
-            ":todokey": "todo#"
-          }
+            ":todokey": "todo#",
+          },
         };
         const result = await docClient.query(params).promise();
         return result.Items.map(({ pk, sk, data }) => {
           return {
             id: sk.replace("todo#", ""),
-            ...data
+            ...data,
           };
         });
       }
-    }
+    },
   },
   Mutation: {
     addTodo: async (_, { text }, { user }) => {
@@ -67,15 +67,15 @@ const resolvers = {
             createdAt: Date.now(),
             updatedAt: Date.now(),
             done: false,
-            text
-          }
-        }
+            text,
+          },
+        },
       };
       await docClient.put(params).promise();
       return {
         id: todoUuid,
         done: false,
-        text
+        text,
       };
     },
     updateTodoDone: async (_, { id }, { user }) => {
@@ -86,17 +86,17 @@ const resolvers = {
         TableName: table,
         Key: {
           pk: `user#${user}`,
-          sk: `todo#${id}`
+          sk: `todo#${id}`,
         },
         UpdateExpression: "set #data.#done = :newdone",
         ExpressionAttributeNames: {
           "#data": "data",
-          "#done": "done"
+          "#done": "done",
         },
         ExpressionAttributeValues: {
-          ":newdone": true
+          ":newdone": true,
         },
-        ReturnValues: "ALL_NEW"
+        ReturnValues: "ALL_NEW",
       };
       const result = await docClient.update(params).promise();
 
@@ -104,10 +104,10 @@ const resolvers = {
       return {
         id: sk.replace("todo#", ""),
         text: data.text,
-        done: data.done
+        done: data.done,
       };
-    }
-  }
+    },
+  },
 };
 
 const server = new ApolloServer({
@@ -126,12 +126,12 @@ const server = new ApolloServer({
   // If you'd like to have GraphQL Playground and introspection enabled in production,
   // the `playground` and `introspection` options must be set explicitly to `true`.
   playground: true,
-  introspection: true
+  introspection: true,
 });
 
 module.exports = server.createHandler({
   cors: {
     origin: "*",
-    credentials: true
-  }
+    credentials: true,
+  },
 });
